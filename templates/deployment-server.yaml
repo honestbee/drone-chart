@@ -20,7 +20,7 @@ spec:
         version: "{{ .Values.image.tag }}"
     spec:
       containers:
-      - image: nginx:alpine
+      - image: nginx:1.11-alpine
         imagePullPolicy: Always
         name: nginx
         ports:
