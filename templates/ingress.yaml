@@ -2,26 +2,26 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: {{ template "fullname" . }}
-{{- if .Values.ingress.ssl.enabled }}
+  name: "{{ template "fullname" . }}"
   annotations:
+    kubernetes.io/tls-acme: "true"
     kubernetes.io/ingress.class: "nginx"
     ingress.kubernetes.io/ssl-redirect: "true"
-{{- end }}
+    # nginx config upstream requires https
+    # ingress.kubernetes.io/secure-backends: "true"
+    # registry needs to increase proxy-body-size
+    ingress.kubernetes.io/proxy-body-size: 100m
 spec:
-{{- if .Values.ingress.ssl.enabled }}
   tls:
   - hosts:
     - "{{ .Values.ingress.host }}"
-    secretName: tls-bundle-build #{{ template "fullname" . }}-tls
-{{- end }}
+    secretName: {{ .Values.ingress.host }}.tls
   rules:
   - host: '{{ .Values.ingress.host }}'
     http:
       paths:
-      - path: '{{ .Values.ingress.path }}'
-        backend:
-          serviceName: '{{ template "fullname" . }}'
+      - backend:
+          serviceName: {{ template "fullname" . }}
           servicePort: {{ .Values.service.http.externalPort }}
-
+        path: /
 {{- end }}
